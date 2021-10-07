@@ -20,3 +20,4 @@ C:\K020G1187\CG2\draw07-04\draw07-04\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug
 C:\K020G1187\CG2\draw07-04画像出ない\draw07-04\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
 C:\K020G1187\旧\2年前期\CG2\draw07-04画像出ない\draw07-04\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
 C:\K020G1187\CG3\draw07-04\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\チーム制作\1_ラビリズム2\github\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
