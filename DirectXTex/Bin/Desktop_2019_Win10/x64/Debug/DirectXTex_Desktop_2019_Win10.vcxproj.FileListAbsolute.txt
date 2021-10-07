@@ -1,0 +1,22 @@
+C:\K020G1187\CG2\draw04-02\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\CG2\draw04-03\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\CG2\draw05-02\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\CG2\draw05-03\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\CG2\draw05-03Once\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\CG2\draw05-04\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\CG2\draw05-04回転とちう\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\CG2\draw05-04チャレンジstep2_2 - コピー\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\CG2\draw06-01\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\CG2\draw06-03\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\CG2\draw06-04まだ手を付けてない\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\CG2\draw06-05とちう\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\CG2\draw06-05とちう毎フレーム処理増やしてない\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\CG2\draw06-06\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\CG2\backup\draw07-01(06-06を書き換えて作った)\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\CG2\draw07-02とちう\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\CG2\draw07-03とちう - コピー\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\CG2\draw07-02\draw07-02を改変した06-07\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\CG2\draw07-04\draw07-04\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\CG2\draw07-04画像出ない\draw07-04\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\旧\2年前期\CG2\draw07-04画像出ない\draw07-04\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+C:\K020G1187\CG3\draw07-04\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
