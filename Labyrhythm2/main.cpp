@@ -724,7 +724,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
     sprite[1].size.y = 100.0f;
 
     sprite[0].texSize = { 1280, 720 };
-    sprite[1].texSize = { 546, 546 };
+    sprite[1].texSize = { 32, 32 };
 
     //頂点バッファに反映
     for (int i = 0; i < s_count; i++)
