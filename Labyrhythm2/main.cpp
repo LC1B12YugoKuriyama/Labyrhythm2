@@ -828,7 +828,7 @@ void SoundUnload(SoundData* soundData) {
     soundData->wfex = {};
 }
 //音声再生
-void SoundPlayWave(IXAudio2* xAudio2, const SoundData& soundData) {
+void SoundPlayWave(IXAudio2* xAudio2, const SoundData& soundData, int loopCount) {
     HRESULT result;
 
     //波形フォーマットをもとにSourceVoiceの生成
@@ -841,12 +841,12 @@ void SoundPlayWave(IXAudio2* xAudio2, const SoundData& soundData) {
     buf.pAudioData = soundData.pBuffer;
     buf.AudioBytes = soundData.bufferSize;
     buf.Flags = XAUDIO2_END_OF_STREAM;
+    buf.LoopCount = loopCount;
 
     //波形データの再生
     result = pSourceVoice->SubmitSourceBuffer(&buf);
     result = pSourceVoice->Start();
 }
-
 //# Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
@@ -1362,7 +1362,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
     //音声読み込み
     SoundData soundData1 = SoundLoadWave("Resources/BGM/Alarm01.wav");
     //音声再生
-    //SoundPlayWave(xAudio2.Get(), soundData1);
 
     //描画初期化処理　ここまで
 
@@ -1382,7 +1381,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
         input->Update();
 
         if (input->TriggerKey(DIK_0)) {
-            OutputDebugStringA("Hit 0\n");
+            //OutputDebugStringA("Hit 0\n");
+            SoundPlayWave(xAudio2.Get(), soundData1, 255);
         }
 
         //座標操作
@@ -1396,7 +1396,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
         {
             UpdateObject3d(&object3ds[i], matView, matProjection);
         }
-
 
         //GPU上のバッファに対応した仮想メモリを取得
         Vertex* vertMap = nullptr;
