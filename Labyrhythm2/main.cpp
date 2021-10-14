@@ -6,19 +6,15 @@
 #include <string>
 #include <DirectXMath.h>
 #include <d3dcompiler.h>
-#include <dinput.h>
 #include <DirectXTex.h>
 #include <wrl.h>
 #include <xaudio2.h>
 #include <fstream>
-
-#define DIRECTINPUT_VERSION 0x0800
+#include "Input.h"
 
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
-#pragma comment(lib, "dinput8.lib")
-#pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "xaudio2.lib")
 
 using namespace DirectX;
@@ -654,7 +650,7 @@ Sprite SpriteCreate(ID3D12Device* dev, int window_width, int window_height, UINT
 
     return sprite;
 }
-// 3Dオブジェクト型
+//3Dオブジェクト型
 struct Object3d
 {
     // 定数バッファ
@@ -668,8 +664,7 @@ struct Object3d
     // 親オブジェクトへのポインタ
     Object3d* parent = nullptr;
 };
-
-// 3Dオブジェクト初期化
+//3Dオブジェクト初期化
 void InitializeObject3d(Object3d* object, int index, ID3D12Device* dev, ID3D12DescriptorHeap* descHeap)
 {
     HRESULT result;
@@ -683,7 +678,7 @@ void InitializeObject3d(Object3d* object, int index, ID3D12Device* dev, ID3D12De
         nullptr,
         IID_PPV_ARGS(&object->constBuff));
 }
-
+//3Dオブジェクト更新
 void UpdateObject3d(Object3d* object, XMMATRIX& matView, XMMATRIX& matProjection)
 {
     XMMATRIX matScale, matRot, matTrans;
@@ -716,7 +711,7 @@ void UpdateObject3d(Object3d* object, XMMATRIX& matView, XMMATRIX& matProjection
         object->constBuff->Unmap(0, nullptr);
     }
 }
-
+//3Dオブジェクト描画
 void DrawObject3d(Object3d* object, ID3D12GraphicsCommandList* cmdList, ID3D12DescriptorHeap* descHeap, D3D12_VERTEX_BUFFER_VIEW& vbView, D3D12_INDEX_BUFFER_VIEW& ibView, D3D12_GPU_DESCRIPTOR_HANDLE gpuDescHandleSRV, unsigned short* indices, UINT numIndices)
 {
     // デスクリプタヒープの配列
@@ -735,8 +730,6 @@ void DrawObject3d(Object3d* object, ID3D12GraphicsCommandList* cmdList, ID3D12De
     // 描画コマンド
     cmdList->DrawIndexedInstanced(numIndices, 1, 0, 0, 0);
 }
-
-
 //チャンクヘッダ
 struct ChunkHeader {
     char id[4];     //チャンク毎のID
@@ -1089,18 +1082,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
     result = dev->CreateFence(fenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 
-    ComPtr<IDirectInput8> dinput = nullptr;
-    result = DirectInput8Create(w.hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8,
-        (void**)&dinput, nullptr);
-
-    ComPtr<IDirectInputDevice8> devkeyboard = nullptr;
-    result = dinput->CreateDevice(GUID_SysKeyboard, &devkeyboard, NULL);
-
-    result = devkeyboard->SetDataFormat(&c_dfDIKeyboard);
-
-    result = devkeyboard->SetCooperativeLevel(
-        hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY
-    );
+    //ポインタ置き場
+    Input* input = nullptr;
+    //入力の初期化
+    input = new Input();
+    input->Initialize(w.hInstance, hwnd);
 
     //XAudioエンジンのインスタンスを作成
     result = XAudio2Create(&xAudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
@@ -1376,7 +1362,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
     //音声読み込み
     SoundData soundData1 = SoundLoadWave("Resources/BGM/Alarm01.wav");
     //音声再生
-    SoundPlayWave(xAudio2.Get(), soundData1);
+    //SoundPlayWave(xAudio2.Get(), soundData1);
 
     //描画初期化処理　ここまで
 
@@ -1393,18 +1379,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
             break;
         }
         //DirectX毎フレーム処理　ここから
-        //キーボード情報の取得開始
-        devkeyboard->Acquire();
+        input->Update();
 
-        //全キーの入力状態を取得する
-        BYTE key[256] = {};
-        result = devkeyboard->GetDeviceState(sizeof(key), key);
+        if (input->TriggerKey(DIK_0)) {
+            OutputDebugStringA("Hit 0\n");
+        }
 
         //座標操作
-        if (key[DIK_UP] || key[DIK_DOWN] || key[DIK_RIGHT] || key[DIK_LEFT])
+        if (input->PushKey(DIK_UP) || input->PushKey(DIK_DOWN) || input->PushKey(DIK_RIGHT) || input->PushKey(DIK_LEFT))
         {
-            if (key[DIK_UP]) { object3ds[0].position.y += 1.0f; } else if (key[DIK_DOWN]) { object3ds[0].position.y -= 1.0f; }
-            if (key[DIK_RIGHT]) { object3ds[0].position.x += 1.0f; } else if (key[DIK_LEFT]) { object3ds[0].position.x -= 1.0f; }
+            if (input->PushKey(DIK_UP)) { object3ds[0].position.y += 1.0f; } else if (input->PushKey(DIK_DOWN)) { object3ds[0].position.y -= 1.0f; }
+            if (input->PushKey(DIK_RIGHT)) { object3ds[0].position.x += 1.0f; } else if (input->PushKey(DIK_LEFT)) { object3ds[0].position.x -= 1.0f; }
         }
 
         for (int i = 0; i < _countof(object3ds); i++)
@@ -1514,6 +1499,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
         //DirectX毎フレーム処理　ここまで
     }
 
+    //入力解放
+    delete input;
     //XAudio解放
     xAudio2.Reset();
     //音声データ解放
