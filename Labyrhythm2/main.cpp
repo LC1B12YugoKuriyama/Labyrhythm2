@@ -10,6 +10,7 @@
 #include <wrl.h>
 #include <xaudio2.h>
 #include <fstream>
+#include <sstream>
 #include "Input.h"
 
 #pragma comment(lib, "d3dcompiler.lib")
@@ -19,6 +20,7 @@
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
+using namespace std;
 
 //ウィンドウプロシージャの定義
 LRESULT CALLBACK WindowProc(
@@ -712,7 +714,7 @@ void UpdateObject3d(Object3d* object, XMMATRIX& matView, XMMATRIX& matProjection
     }
 }
 //3Dオブジェクト描画
-void DrawObject3d(Object3d* object, ID3D12GraphicsCommandList* cmdList, ID3D12DescriptorHeap* descHeap, D3D12_VERTEX_BUFFER_VIEW& vbView, D3D12_INDEX_BUFFER_VIEW& ibView, D3D12_GPU_DESCRIPTOR_HANDLE gpuDescHandleSRV, unsigned short* indices, UINT numIndices)
+void DrawObject3d(Object3d* object, ID3D12GraphicsCommandList* cmdList, ID3D12DescriptorHeap* descHeap, D3D12_VERTEX_BUFFER_VIEW& vbView, D3D12_INDEX_BUFFER_VIEW& ibView, D3D12_GPU_DESCRIPTOR_HANDLE gpuDescHandleSRV, UINT numIndices)
 {
     // デスクリプタヒープの配列
     ID3D12DescriptorHeap* ppHeaps[] = { descHeap };
@@ -1095,91 +1097,89 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
     //DirectX初期化処理　ここまで
 
     //描画初期化処理
-    Vertex vertices[] = {
-        //前
-        {{-50.0f, -50.0f, -50.0f}, {}, {0.0f, 1.0f}},//0
-        {{-50.0f, +50.0f, -50.0f}, {}, {0.0f, 0.0f}},//1
-        {{+50.0f, -50.0f, -50.0f}, {}, {1.0f, 1.0f}},//2
-        {{+50.0f, +50.0f, -50.0f}, {}, {1.0f, 0.0f}},//3
-        //後
-        {{-50.0f, -50.0f, +50.0f}, {}, {0.0f, 1.0f}},//4
-        {{-50.0f, +50.0f, +50.0f}, {}, {0.0f, 0.0f}},//5
-        {{+50.0f, -50.0f, +50.0f}, {}, {1.0f, 1.0f}},//6
-        {{+50.0f, +50.0f, +50.0f}, {}, {1.0f, 0.0f}},//7
-        //左
-        {{-50.0f, -50.0f, -50.0f}, {}, {0.0f, 1.0f}},//0
-        {{-50.0f, -50.0f, +50.0f}, {}, {0.0f, 0.0f}},//4
-        {{-50.0f, +50.0f, -50.0f}, {}, {1.0f, 1.0f}},//1
-        {{-50.0f, +50.0f, +50.0f}, {}, {1.0f, 0.0f}},//5
-        //右
-        {{+50.0f, -50.0f, -50.0f}, {}, {0.0f, 1.0f}},//2
-        {{+50.0f, -50.0f, +50.0f}, {}, {0.0f, 0.0f}},//6
-        {{+50.0f, +50.0f, -50.0f}, {}, {1.0f, 1.0f}},//3
-        {{+50.0f, +50.0f, +50.0f}, {}, {1.0f, 0.0f}},//7
-        //下
-        {{-50.0f, -50.0f, -50.0f}, {}, {0.0f, 1.0f}},//0
-        {{+50.0f, -50.0f, -50.0f}, {}, {0.0f, 0.0f}},//2
-        {{-50.0f, -50.0f, +50.0f}, {}, {1.0f, 1.0f}},//4
-        {{+50.0f, -50.0f, +50.0f}, {}, {1.0f, 0.0f}},//6
-        //上
-        {{-50.0f, +50.0f, -50.0f}, {}, {0.0f, 1.0f}},//1
-        {{+50.0f, +50.0f, -50.0f}, {}, {0.0f, 0.0f}},//3
-        {{-50.0f, +50.0f, +50.0f}, {}, {1.0f, 1.0f}},//5
-        {{+50.0f, +50.0f, +50.0f}, {}, {1.0f, 0.0f}},//7
-    };
+    std::ifstream file;
+    static std::vector<Vertex> vertices;
+    static std::vector<unsigned short> indices;
 
-    unsigned short indices[] = {
-        //前
-        0, 1, 2, //三角形1つ目
-        2, 1, 3, //三角形2つ目
+    file.open(L"Resources/triangle_mat/triangle_mat.obj");
 
-        //後
-        6, 7, 4, //三角形1つ目
-        4, 7, 5, //三角形2つ目
+    if (file.fail()) {
+        assert(0);
+    }
+    vector<XMFLOAT3> positions;	//頂点座標
+    vector<XMFLOAT3> normals;	//法線ベクトル
+    vector<XMFLOAT2> texcoords;	//テクスチャUV
+    //1行ずつ読み込む
+    string line;
+    while (getline(file, line)) {
 
-        //左
-        8, 9, 10, //三角形1つ目
-        10, 9, 11, //三角形2つ目
+        //1行分の文字列をストリームに変換して解析しやすくする
+        std::istringstream line_stream(line);
 
-        //右
-        12, 14, 13, //三角形1つ目
-        13, 14, 15, //三角形2つ目
+        //半角スペース区切りで行の先頭を文字列を取得
+        string key;
+        getline(line_stream, key, ' ');
 
-        //上
-        16, 17, 18, //三角形1つ目
-        18, 17, 19, //三角形2つ目
+        if (key == "v") {
+            //X,Y,Z座標読み込み
+            XMFLOAT3 position{};
+            line_stream >> position.x;
+            line_stream >> position.y;
+            line_stream >> position.z;
+            //座標データに追加
+            positions.emplace_back(position);
+        }
 
-        //下
-        20, 22, 21, //三角形1つ目
-        21, 22, 23, //三角形2つ目
-    };
+        if (key == "vt") {
+            //U,V成分読み込み
+            XMFLOAT2 texcoord{};
+            line_stream >> texcoord.x;
+            line_stream >> texcoord.y;
+            //V方向反転
+            texcoord.y = 1.0f - texcoord.y;
+            //テクスチャ座標データに追加
+            texcoords.emplace_back(texcoord);
+        }
 
-    for (int i = 0; i < _countof(indices) / 3; i++) {
-        //三角形ひとつごとに計算していく
+        if (key == "vn") {
+            //X,Y,Z成分読み込み
+            XMFLOAT3 normal{};
+            line_stream >> normal.x;
+            line_stream >> normal.y;
+            line_stream >> normal.z;
+            //法線ベクトルデータに追加
+            normals.emplace_back(normal);
+        }
 
-        //三角形のインデックスを取り出して、一時的な変数に入れる
-        unsigned short Tempo1 = indices[i * 3 + 0];
-        unsigned short Tempo2 = indices[i * 3 + 1];
-        unsigned short Tempo3 = indices[i * 3 + 2];
+        if (key == "f") {
+            //半角スペース区切りで行の続きを読み込む
+            string index_string;
+            while (getline(line_stream, index_string, ' ')) {
+                //頂点インデックス1個分の文字列をストリームに変換して解析しやすくする
+                std::istringstream index_stream(index_string);
+                unsigned short indexPosition, indexNormal, indexTexcoord;
+                index_stream >> indexPosition;
+                index_stream.seekg(1, ios_base::cur);//スラッシュをとばす
+                index_stream >> indexTexcoord;
+                index_stream.seekg(1, ios_base::cur);//スラッシュをとばす
+                index_stream >> indexNormal;
 
-        XMVECTOR p0 = XMLoadFloat3(&vertices[Tempo1].pos);
-        XMVECTOR p1 = XMLoadFloat3(&vertices[Tempo2].pos);
-        XMVECTOR p2 = XMLoadFloat3(&vertices[Tempo3].pos);
-
-        XMVECTOR v1 = XMVectorSubtract(p1, p0);
-        XMVECTOR v2 = XMVectorSubtract(p2, p0);
-
-        XMVECTOR normal = XMVector3Cross(v1, v2);
-
-        normal = XMVector3Normalize(normal);
-
-        XMStoreFloat3(&vertices[Tempo1].normal, normal);
-        XMStoreFloat3(&vertices[Tempo2].normal, normal);
-        XMStoreFloat3(&vertices[Tempo3].normal, normal);
+                //頂点データの追加
+                Vertex vertex{};
+                vertex.pos = positions[indexPosition - 1];
+                vertex.normal = normals[indexNormal - 1];
+                vertex.uv = texcoords[indexTexcoord - 1];
+                vertices.emplace_back(vertex);
+                //インデックスデータの追加
+                indices.emplace_back((unsigned short)indices.size());
+            }
+        }
     }
 
+    file.close();
+
     //頂点データ全体のサイズ = 頂点データ一つ分のサイズ * 頂点データの要素数
-    UINT sizeVB = static_cast<UINT>(sizeof(Vertex) * _countof(vertices));
+    UINT sizeVB = static_cast<UINT>(sizeof(Vertex) * vertices.size());
 
     //頂点バッファの生成
     ComPtr<ID3D12Resource> vertBuff;
@@ -1195,11 +1195,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
     Vertex* vertMap = nullptr;
     result = vertBuff->Map(0, nullptr, (void**)&vertMap);
 
-    //全頂点に対して
-    for (int i = 0; i < _countof(vertices); i++)
-    {
-        vertMap[i] = vertices[i];   //座標をコピー
-    }
+    std::copy(vertices.begin(), vertices.end(), vertMap);
 
     //マップを解除
     vertBuff->Unmap(0, nullptr);
@@ -1211,7 +1207,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
     vbView.StrideInBytes = sizeof(Vertex);
 
     //インデックスデータ全体のサイズ
-    UINT sizeIB = static_cast<UINT>(sizeof(unsigned short) * _countof(indices));
+    UINT sizeIB = static_cast<UINT>(sizeof(unsigned short) * indices.size());
 
     //インデックスバッファの設定
     ComPtr<ID3D12Resource> indexBuff;
@@ -1236,10 +1232,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
     unsigned short* indexMap = nullptr;
     result = indexBuff->Map(0, nullptr, (void**)&indexMap);
 
-    //全インデックスに対して
-    for (int i = 0; i < _countof(indices); i++) {
-        indexMap[i] = indices[i];//インデックスをコピー
-    }
+    std::copy(indices.begin(), indices.end(), indexMap);
     //繋がりを解除
     indexBuff->Unmap(0, nullptr);
 
@@ -1283,7 +1276,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
         InitializeObject3d(&object3ds[i], i, dev.Get(), basicDescHeap.Get());
     }
 
-    object3ds[0].scale = { 0.5f, 0.5f, 0.5f };
+    object3ds[0].scale = { 20.0f, 20.0f, 20.0f };
 
     //スプライト共通データ生成
     spriteCommon = SpriteCommonCreate(dev.Get(), window_width, window_height);
@@ -1310,7 +1303,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
     ScratchImage scratchImg{};
 
     result = LoadFromWICFile(
-        L"Resources/player.png",
+        L"Resources/triangle_mat/tex1.png",
         WIC_FLAGS_NONE,
         &metadata, scratchImg);
 
@@ -1401,11 +1394,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
         Vertex* vertMap = nullptr;
         result = vertBuff->Map(0, nullptr, (void**)&vertMap);
 
-        //全頂点に対して
-        for (int i = 0; i < _countof(vertices); i++)
-        {
-            vertMap[i] = vertices[i];   // 座標をコピー
-        }
+        std::copy(vertices.begin(), vertices.end(), vertMap);
+
         //マップを解除
         vertBuff->Unmap(0, nullptr);
 
@@ -1454,7 +1444,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
         {
             DrawObject3d(&object3ds[i], cmdList.Get(), basicDescHeap.Get(), vbView, ibView,
                 CD3DX12_GPU_DESCRIPTOR_HANDLE(basicDescHeap->GetGPUDescriptorHandleForHeapStart(), constantBufferNum, dev->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)),
-                indices, _countof(indices));
+                indices.size());
         }
 
         //スプライト共通コマンド
