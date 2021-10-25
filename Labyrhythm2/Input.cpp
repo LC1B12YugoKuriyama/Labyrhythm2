@@ -3,6 +3,12 @@
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 
+Input::Input(HINSTANCE hInstance, HWND hwnd) {
+	Initialize(hInstance, hwnd);
+}
+Input::~Input() {
+
+}
 
 void Input::Initialize(HINSTANCE hInstance, HWND hwnd)
 {
