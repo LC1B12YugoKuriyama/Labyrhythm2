@@ -18,26 +18,43 @@
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Time.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="BasicPS.hlsl">
+    <ClInclude Include="Input.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="map.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Time.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Resources\Shader\SpriteVS.hlsl">
       <Filter>リソース ファイル</Filter>
     </FxCompile>
-    <FxCompile Include="BasicVS.hlsl">
+    <FxCompile Include="Resources\Shader\BasicPS.hlsl">
       <Filter>リソース ファイル</Filter>
     </FxCompile>
-    <FxCompile Include="SpriteVS.hlsl">
+    <FxCompile Include="Resources\Shader\BasicVS.hlsl">
       <Filter>リソース ファイル</Filter>
     </FxCompile>
-    <FxCompile Include="SpritePS.hlsl">
+    <FxCompile Include="Resources\Shader\SpritePS.hlsl">
       <Filter>リソース ファイル</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Basic.hlsli">
+    <None Include="Resources\Shader\Basic.hlsli">
       <Filter>リソース ファイル</Filter>
     </None>
-    <None Include="Sprite.hlsli">
+    <None Include="Resources\Shader\Sprite.hlsli">
       <Filter>リソース ファイル</Filter>
     </None>
   </ItemGroup>
