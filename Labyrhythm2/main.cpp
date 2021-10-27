@@ -934,7 +934,7 @@ void SoundStopWave(SoundData& soundData) {
 }
 
 //音声再生
-void SoundPlayWave(IXAudio2* xAudio2, SoundData& soundData, int loopCount) {
+void SoundPlayWave(IXAudio2* xAudio2, SoundData& soundData, int loopCount, float volume = 0.2) {
 	HRESULT result;
 
 	//波形フォーマットをもとにSourceVoiceの生成
@@ -950,7 +950,7 @@ void SoundPlayWave(IXAudio2* xAudio2, SoundData& soundData, int loopCount) {
 
 	//波形データの再生
 	result = soundData.pSourceVoice->SubmitSourceBuffer(&buf);
-	result = soundData.pSourceVoice->SetVolume(0.2);
+	result = soundData.pSourceVoice->SetVolume(volume);
 	result = soundData.pSourceVoice->Start();
 	soundData.setPlayFlag(true);
 }
