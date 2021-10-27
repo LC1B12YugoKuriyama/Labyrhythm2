@@ -1,0 +1,16 @@
+﻿  main.cpp
+C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(688,41): warning C4244: '=': 'UINT64' から 'float' への変換です。データが失われる可能性があります。
+C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(689,41): warning C4244: '=': 'UINT' から 'float' への変換です。データが失われる可能性があります。
+C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(730,23): warning C4244: '引数': 'int' から 'float' への変換です。データが失われる可能性があります。
+C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(730,9): warning C4244: '引数': 'int' から 'float' への変換です。データが失われる可能性があります。
+C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(858,10): warning C4101: 'result': ローカル変数は 1 度も使われていません。
+C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(953,48): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2316,31): warning C4267: '引数': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
+C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2321,40): warning C4267: '引数': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
+C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2330,41): warning C4267: '引数': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
+C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2336,45): warning C4267: '引数': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
+  コード生成しています。
+  Previous IPDB and IOBJ mismatch, fall back to full compilation.
+  All 1068 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  コード生成が終了しました。
+  Labyrhythm2.vcxproj -> C:\K020G1187\チーム制作\1_ラビリズム2\github\x64\Release\Labyrhythm2.exe

@@ -934,7 +934,7 @@ void SoundStopWave(SoundData& soundData) {
 }
 
 //音声再生
-void SoundPlayWave(IXAudio2* xAudio2, SoundData& soundData, int loopCount) {
+void SoundPlayWave(IXAudio2* xAudio2, SoundData& soundData, int loopCount, float volume = 0.2) {
 	HRESULT result;
 
 	//波形フォーマットをもとにSourceVoiceの生成
@@ -950,7 +950,7 @@ void SoundPlayWave(IXAudio2* xAudio2, SoundData& soundData, int loopCount) {
 
 	//波形データの再生
 	result = soundData.pSourceVoice->SubmitSourceBuffer(&buf);
-	result = soundData.pSourceVoice->SetVolume(0.2);
+	result = soundData.pSourceVoice->SetVolume(volume);
 	result = soundData.pSourceVoice->Start();
 	soundData.setPlayFlag(true);
 }
@@ -1944,6 +1944,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	enum DIRECTION { UP, RIGHT, DOWN, LEFT };
 	int nowDirection = DIRECTION::UP;
 
+	int directionChangeTime = 0;
+
 	int clearTime = 99999;
 
 	XMFLOAT3 eyeDef = eye;
@@ -2010,18 +2012,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 				changeDirectionNum = 0;
 				nowDirection = DIRECTION::UP;
-				playerMapY = playerMapYStart;
-				playerMapX = playerMapXStart;
-				viewPoint = VIEW_POINT::LOOKDOWN;
-				lastMoveDirection = lastMoveDirectionStart;
-				triangle[0].position = player[0].position;
-				triangle[0].position.z -= mapSide;
-				triangle[0].position.y += mapSide * 1.5;
-				triangle[0].scale = { 1,1,1 };
 
 				playerMapY = playerMapYStart;
 				playerMapX = playerMapXStart;
 				player[0].position = object3ds[playerMapY][playerMapX].position;
+
+				viewPoint = VIEW_POINT::LOOKDOWN;
+
+				lastMoveDirection = lastMoveDirectionStart;
+				directionChangeTime = 0;
+
+				triangle[0].position = player[0].position;
+				triangle[0].position.z -= mapSide;
+				triangle[0].position.y += mapSide * 1.5;
+				triangle[0].scale = { 1,1,1 };
 
 				//音流す
 				SoundPlayWave(xAudio2.Get(), bgm, XAUDIO2_LOOP_INFINITE);
@@ -2035,6 +2039,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			time->update();	//今の時間を記録
 
 			if (time->getNowTime() >= time->getOneBeatTime() * (changeDirectionNum + 1)) {	//方向変える時間になったら
+				directionChangeTime = time->getNowTime();
 				changeDirectionNum++;
 				nowDirection++;
 				movableFlag = true;
@@ -2063,21 +2068,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			}
 
 
-			/*if (input->PushKey(DIK_UP) || input->PushKey(DIK_LEFT) || input->PushKey(DIK_DOWN) || input->PushKey(DIK_RIGHT)) {
-				if (input->PushKey(DIK_UP)) {
-				player[0].position.y += spriteMoveVal;
-				} else if (input->PushKey(DIK_DOWN)) {
-				player[0].position.y -= spriteMoveVal;
-				}
-				if (input->PushKey(DIK_RIGHT)) {
-				player[0].position.x += spriteMoveVal;
-				} else if (input->PushKey(DIK_LEFT)) {
-				player[0].position.x -= spriteMoveVal;
-				}
-			}*/
 
 
-
+#ifdef EYE_MOVE_OK
 #pragma region 視点切り替え
 
 			if (viewPoint != VIEW_POINT::FP && input->TriggerKey(DIK_1)) {
@@ -2132,6 +2125,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				viewPoint = VIEW_POINT::LOOKDOWN;
 			}
 #pragma endregion 視点切り替え
+#endif
 
 			if (movableFlag == true && input->TriggerKey(DIK_SPACE)) {
 				//todo 移動
@@ -2202,17 +2196,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				}
 			}
 
-			//todo triangle(丸)のscaleを、方向変化から時間がたつにつれて小さくする
-			triangle[0].scale.x -= 0.02;
-			if (triangle[0].scale.x <= 0)triangle[0].scale.x = 1;
-			triangle[0].scale.y -= 0.02;
-			if (triangle[0].scale.y <= 0)triangle[0].scale.y = 1;
-			triangle[0].scale.z -= 0.02;
-			if (triangle[0].scale.z <= 0)triangle[0].scale.z = 1;
+			//triangle(丸)のscaleを、方向変化から時間がたつにつれて小さくする
+			{
+				float dirTime = ((float)time->getNowTime() - directionChangeTime) / time->getOneBeatTime();
+				triangle[0].scale = { 1 - dirTime, 1 - dirTime, 1 - dirTime };
+			}
 
 
 			//「ゴールしたら」を想定した処理
-			if (input->TriggerKey(DIK_E) || Map::map[playerMapY][playerMapX] == Map::G) {
+			if (Map::map[playerMapY][playerMapX] == Map::G) {
 				clearTime = time->getNowTime();
 				SoundStopWave(bgm);
 				SoundPlayWave(xAudio2.Get(), sceneChangeSe, 0);
@@ -2289,8 +2281,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		D3D12_CPU_DESCRIPTOR_HANDLE dsvH = dsvHeap->GetCPUDescriptorHandleForHeapStart();
 		cmdList->OMSetRenderTargets(1, &rtvH, false, &dsvH);
 
-		// ３．画面クリア           R     G     B    A
-		float clearColor[] = { 0.4f, 0.4f, 0.4f }; // 何もないところの描画色
+		// ３．画面クリア		R		G	B
+		float clearColor[] = { 0.35f, 0.4f, 0.4f }; // 何もないところの描画色
 		cmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
 		cmdList->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
