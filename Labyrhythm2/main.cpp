@@ -1925,6 +1925,114 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma endregion ゴールモデル
 
+#pragma region エフェクトモデル
+	//定数バッファ用デスクリプターヒープの生成
+	ComPtr<ID3D12DescriptorHeap> effDescHeap = nullptr;
+	D3D12_DESCRIPTOR_HEAP_DESC effDescHeapDesc{};
+	effDescHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	effDescHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	effDescHeapDesc.NumDescriptors = constantBufferNum + 1;
+	// 生成
+	result = dev->CreateDescriptorHeap(&effDescHeapDesc, IID_PPV_ARGS(&effDescHeap));
+
+	std::vector<Vertex> effVertices{};
+	std::vector<unsigned short> effIndices{};
+	ComPtr<ID3D12Resource> effVertBuff;
+	Vertex* effVertMap{};
+	D3D12_VERTEX_BUFFER_VIEW effVbView;
+	ComPtr<ID3D12Resource> effIndexBuff;
+	D3D12_INDEX_BUFFER_VIEW effIbView;
+	XMMATRIX effMatProjection;
+	int effEndTime = 500;
+	int effR = mapSide * 4;
+
+	float effGravity = 128.f;
+	float effSpeed = 1.f;
+
+	int effStartTime = 0;
+	int effNowTime = 0;
+
+	bool effFlag = false;
+
+	const float effScale = 0.5f;
+
+	struct effGrain {
+		XMFLOAT3 startPos = { 0,0,0 };
+		XMFLOAT3 v0 = { 1,1,1 };
+		bool alive = false;
+		Object3d eff;
+	};
+
+
+	loadModel(dev.Get(), effVertices, effIndices, L"Resources/eff/eff.obj",
+		window_width, window_height,
+		effVertBuff, effVertMap, effVbView,
+		effIndexBuff, effIbView, effMatProjection);
+
+	const unsigned int effNum = 32;
+	std::vector<effGrain> grain(effNum);
+	for (unsigned int i = 0; i < effNum; i++) {
+		InitializeObject3d(&grain[i].eff, i, dev.Get(), effDescHeap.Get());
+		grain[i].eff.scale = { effScale, effScale, effScale };
+		grain[i].eff.position = player[0].position;
+	}
+
+#pragma region モデルシェーダー(テクスチャ)
+	//WICテクスチャのロード
+	TexMetadata effMetadata{};
+	ScratchImage effScratchImg{};
+
+	result = LoadFromWICFile(
+		L"Resources/eff/eff.png",
+		WIC_FLAGS_NONE,
+		&effMetadata, effScratchImg);
+
+	const Image* effImg = effScratchImg.GetImage(0, 0, 0);
+
+	//テクスチャバッファのリソース設定
+	CD3DX12_RESOURCE_DESC effTexresDesc = CD3DX12_RESOURCE_DESC::Tex2D(
+		effMetadata.format,
+		effMetadata.width,
+		(UINT)effMetadata.height,
+		(UINT16)effMetadata.arraySize,
+		(UINT16)effMetadata.mipLevels
+	);
+
+	//テクスチャバッファの生成
+	ComPtr<ID3D12Resource> efftexBuff = nullptr;
+	result = dev->CreateCommittedResource(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0),
+		D3D12_HEAP_FLAG_NONE,
+		&effTexresDesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&efftexBuff));
+
+	//テクスチャバッファへのデータ転送
+	result = efftexBuff->WriteToSubresource(
+		0,
+		nullptr,
+		effImg->pixels,
+		(UINT)effImg->rowPitch,
+		(UINT)effImg->slicePitch
+	);
+
+	//シェーダーリソースビュー設定
+	D3D12_SHADER_RESOURCE_VIEW_DESC effSrvDesc{};
+	effSrvDesc.Format = effMetadata.format;
+	effSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	effSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	effSrvDesc.Texture2D.MipLevels = 1;
+
+	//ヒープの二番目にシェーダーリソースビュー作成
+	dev->CreateShaderResourceView(efftexBuff.Get(),
+		&effSrvDesc,
+		CD3DX12_CPU_DESCRIPTOR_HANDLE(effDescHeap->GetCPUDescriptorHandleForHeapStart(), constantBufferNum, dev->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV))
+	);
+#pragma endregion モデルシェーダー(テクスチャ)
+
+#pragma endregion エフェクトモデル
+
 
 #pragma region ゲームループ前変数宣言
 	//テキスト
@@ -2007,7 +2115,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// DirectX毎フレーム処理　ここから
 
 		input->Update();
-		if (input->PushKey(DIK_ESCAPE)) break;
+		if (input->PushKey(DIK_ESCAPE)) break;	//ESCを押したら即終了する
 
 		switch (frontSprite.texNumber) {
 		case TEX_NUM::TITLE:
@@ -2138,7 +2246,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				case DIRECTION::UP:
 					if (Map::map[playerMapY - 1][playerMapX] != Map::W) {
 						playerMapY--;
-						triangle[0].position.y += mapSide; 
+						triangle[0].position.y += mapSide;
 						movableFlag = false;
 					}
 					break;
@@ -2168,12 +2276,35 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					SoundPlayWave(xAudio2.Get(), moveSe, 0);
 					lastMoveDirection = nowDirection;
 
+					//プレイヤー移動
 					player[0].position = object3ds[playerMapY][playerMapX].position;
 
+					//視点も移動
 					eye.x = player[0].position.x;
 					eye.y = player[0].position.y;
 					target.x = player[0].position.x;
 					target.y = player[0].position.y;
+
+					//エフェクト開始
+					effFlag = true;
+					//todo エフェクト初期化処理
+					const int vMax = effR / ((float)effEndTime / 1000.f);
+					const int vMin = vMax * 0.75f;
+					for (unsigned i = 0; i < grain.size(); i++) {
+						grain[i].startPos = player[0].position;
+						grain[i].eff.position = grain[i].startPos;
+						grain[i].alive = true;
+
+						float angle = XM_PI / 180.f * (rand() % 360);
+						float angle2 = XM_PI / 180.f * (rand() % 360);
+						float v = rand() % (vMax + vMin) + vMin;
+
+						grain[i].v0.x = v * sinf(angle) * cosf(angle2);
+						grain[i].v0.y = v * sinf(angle) * sinf(angle2);
+						grain[i].v0.z = v * cosf(angle2);
+					}
+					effStartTime = time->getNowTime();
+					effNowTime = effStartTime;
 
 
 					if (viewPoint != VIEW_POINT::LOOKDOWN) {
@@ -2206,6 +2337,37 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				}
 			}
 
+			if (effFlag) {
+				effNowTime = time->getNowTime() - effStartTime;
+				if (effNowTime >= effEndTime) {
+					effFlag = false;
+					for (unsigned int i = 0; i < grain.size(); i++) {
+						grain[i].alive = false;
+					}
+				} else {
+					//エフェクトの移動処理
+					const float effRate = (float)effNowTime / effEndTime;
+					const float scaleVal = (1.f - effRate) * effScale;
+					const float oneSec = 1000.f;
+					for (int i = 0; i < grain.size(); i++) {
+						grain[i].eff.position.x = grain[i].startPos.x +
+							effSpeed * effNowTime / oneSec * grain[i].v0.x;
+
+						grain[i].eff.position.y = grain[i].startPos.y +
+							(grain[i].v0.y * effSpeed * effNowTime / oneSec) -
+							(effGravity * effSpeed * effNowTime / oneSec * effSpeed * effNowTime / oneSec / 2.f);
+
+						grain[i].eff.position.z = grain[i].startPos.z +
+							effSpeed * effNowTime / oneSec * grain[i].v0.z;
+
+						grain[i].eff.scale = { scaleVal,scaleVal,scaleVal };
+					}
+					/*char tmp[32];
+					snprintf(tmp, 32, "%.2f倍\n", scaleVal);
+					OutputDebugStringA(tmp);*/
+				}
+			}
+
 			//triangle(丸)のscaleを、方向変化から時間がたつにつれて小さくする
 			{
 				float dirTime = ((float)time->getNowTime() - directionChangeTime) / time->getOneBeatTime();
@@ -2235,6 +2397,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				for (int y = 0; y < Map::mapNumY; y++) {
 					UpdateObject3d(&object3ds[y][x], matView, matProjection);
 				}
+			}
+			for (unsigned int i = 0; i < grain.size(); i++) {
+				UpdateObject3d(&grain[i].eff, matView, effMatProjection);
 			}
 
 
@@ -2344,6 +2509,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				DrawObject3d(&triangle[i], cmdList.Get(), triangleDescHeap.Get(), triangleVbView, triangleIbView,
 					CD3DX12_GPU_DESCRIPTOR_HANDLE(triangleDescHeap->GetGPUDescriptorHandleForHeapStart(), constantBufferNum, dev->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)),
 					triangleIndices, triangleIndices.size());
+			}
+			//エフェクト描画
+			for (unsigned int i = 0; i < grain.size(); i++) {
+				if (grain[i].alive == true) {
+					DrawObject3d(&grain[i].eff, cmdList.Get(), effDescHeap.Get(), effVbView, effIbView,
+						CD3DX12_GPU_DESCRIPTOR_HANDLE(effDescHeap->GetGPUDescriptorHandleForHeapStart(), constantBufferNum, dev->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)),
+						effIndices, effIndices.size()
+					);
+				}
 			}
 
 			break;
