@@ -1134,8 +1134,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// コンソールへの文字出力
 	//OutputDebugStringA("Hello,DirectX!!\n");
 	// ウィンドウサイズ
-	const int window_width = 900;  // 横幅
-	const int window_height = 900;  // 縦幅
+	const int window_width = 800;  // 横幅
+	const int window_height = 800;  // 縦幅
 
 	WNDCLASSEX w{}; // ウィンドウクラスの設定
 	w.cbSize = sizeof(WNDCLASSEX);
@@ -1153,7 +1153,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// ウィンドウオブジェクトの生成
 	HWND hwnd = CreateWindow(w.lpszClassName, // クラス名
 		winTitle,         // タイトルバーの文字
-		WS_OVERLAPPEDWINDOW,        // 標準的なウィンドウスタイル
+		WS_OVERLAPPEDWINDOW ^ WS_MAXIMIZEBOX ^ WS_THICKFRAME | WS_VISIBLE,        // 標準的なウィンドウスタイル
 		CW_USEDEFAULT,              // 表示X座標（OSに任せる）
 		CW_USEDEFAULT,              // 表示Y座標（OSに任せる）
 		wrc.right - wrc.left,       // ウィンドウ横幅
@@ -1512,7 +1512,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//ビューの変換行列
 	XMMATRIX matView;
-	XMFLOAT3 eye(60, -60, -120); //始点座標
+	XMFLOAT3 eye(0, 0, -70); //始点座標
 	XMFLOAT3 target(eye.x, eye.y, 0); //注意点座標
 	XMFLOAT3 up(0, 1, 0); //上方向ベクトル
 	matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
@@ -1680,6 +1680,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/*player[i].position.x += mapSide / 5.f;
 		player[i].position.y -= mapSide / 5.f;*/
 	}
+
+	eye.x = player[0].position.x;
+	eye.y = player[0].position.y;
+	target.x = player[0].position.x;
+	target.y = player[0].position.y;
 
 #pragma region モデルシェーダー(テクスチャ)
 	//WICテクスチャのロード
@@ -2133,7 +2138,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				case DIRECTION::UP:
 					if (Map::map[playerMapY - 1][playerMapX] != Map::W) {
 						playerMapY--;
-						triangle[0].position.y += mapSide;
+						triangle[0].position.y += mapSide; 
 						movableFlag = false;
 					}
 					break;
@@ -2164,6 +2169,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					lastMoveDirection = nowDirection;
 
 					player[0].position = object3ds[playerMapY][playerMapX].position;
+
+					eye.x = player[0].position.x;
+					eye.y = player[0].position.y;
+					target.x = player[0].position.x;
+					target.y = player[0].position.y;
 
 
 					if (viewPoint != VIEW_POINT::LOOKDOWN) {
