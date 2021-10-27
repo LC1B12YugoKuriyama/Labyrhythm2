@@ -5,16 +5,16 @@ C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(730,
 C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(730,9): warning C4244: '引数': 'int' から 'float' への変換です。データが失われる可能性があります。
 C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(858,10): warning C4101: 'result': ローカル変数は 1 度も使われていません。
 C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(1947,11): warning C4244: '初期化中': 'float' から 'int' への変換です。データが失われる可能性があります。
-C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2291,28): warning C4244: '初期化中': 'float' から 'int' への変換です。データが失われる可能性があります。
-C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2291,21): warning C4244: '初期化中': 'float' から 'const int' への変換です。データが失われる可能性があります。
-C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2292,28): warning C4244: '初期化中': 'float' から 'int' への変換です。データが失われる可能性があります。
-C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2292,21): warning C4244: '初期化中': 'float' から 'const int' への変換です。データが失われる可能性があります。
-C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2300,15): warning C4244: '初期化中': 'int' から 'float' への変換です。データが失われる可能性があります。
-C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2491,31): warning C4267: '引数': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
-C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2496,40): warning C4267: '引数': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
-C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2505,41): warning C4267: '引数': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
-C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2511,45): warning C4267: '引数': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
-C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2519,6): warning C4267: '引数': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
+C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2296,28): warning C4244: '初期化中': 'float' から 'int' への変換です。データが失われる可能性があります。
+C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2296,21): warning C4244: '初期化中': 'float' から 'const int' への変換です。データが失われる可能性があります。
+C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2297,28): warning C4244: '初期化中': 'float' から 'int' への変換です。データが失われる可能性があります。
+C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2297,21): warning C4244: '初期化中': 'float' から 'const int' への変換です。データが失われる可能性があります。
+C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2305,15): warning C4244: '初期化中': 'int' から 'float' への変換です。データが失われる可能性があります。
+C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2496,31): warning C4267: '引数': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
+C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2501,40): warning C4267: '引数': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
+C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2510,41): warning C4267: '引数': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
+C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2516,45): warning C4267: '引数': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
+C:\K020G1187\チーム制作\1_ラビリズム2\github\Labyrhythm2\main.cpp(2524,6): warning C4267: '引数': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
   コード生成しています。
   1 of 1108 functions (<0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
