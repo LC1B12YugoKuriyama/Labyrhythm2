@@ -45,7 +45,7 @@ using namespace std;
 
 #include "Input.h"
 
-const wchar_t winTitle[] = L"Labyrhythm NEXT ~ only SPACE game  ~";
+const wchar_t winTitle[] = L"ラビリズムNEXT ~ only SPACE game  ~";
 
 //ウィンドウプロシージャの定義
 LRESULT CALLBACK WindowProc(
