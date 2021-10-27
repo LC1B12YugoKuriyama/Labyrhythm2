@@ -2130,6 +2130,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				playerMapX = playerMapXStart;
 				player[0].position = object3ds[playerMapY][playerMapX].position;
 
+				eye.x = player[0].position.x;
+				eye.y = player[0].position.y;
+				target.x = player[0].position.x;
+				target.y = player[0].position.y;
+
 				viewPoint = VIEW_POINT::LOOKDOWN;
 
 				lastMoveDirection = lastMoveDirectionStart;
